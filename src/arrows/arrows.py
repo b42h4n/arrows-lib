@@ -3,13 +3,11 @@ import base64
 from typing import Self
 import zlib
 
-
 class Direction(IntEnum):
     North = 0
     East  = 1
     South = 2
     West  = 3
-
 
 class ArrowType(IntEnum):
     Empty                  = 0
@@ -78,7 +76,6 @@ class ArrowType(IntEnum):
     TODO28                 = 62
     TODO29                 = 63
 
-
 class Color(IntEnum):
     White  = 0
     Red    = 1
@@ -88,7 +85,6 @@ class Color(IntEnum):
     Orange = 5
     Purple = 6
     Black  = 7
-
 
 class Instrument(IntEnum):
     Piano = 0
@@ -114,7 +110,6 @@ class Instrument(IntEnum):
     Timpani = 20
     Drums = 21
 
-
 class Note(IntEnum):
     C      = 0
     CSharp = 1
@@ -128,7 +123,6 @@ class Note(IntEnum):
     A      = 9
     ASharp = 10
     B      = 11
-
 
 class Letter(IntEnum):
     Empty = 0
@@ -192,7 +186,6 @@ class Letter(IntEnum):
     Left  = 58
     Right = 59
 
-
 class Arrow:
     def __init__(self, type: ArrowType = ArrowType.Empty, direction: Direction = Direction.North, flipped = False):
         self.type = type
@@ -224,7 +217,6 @@ class Arrow:
     # walls and keyboard buttons
     letter: Letter
 
-
 class Chunk:
     arrows: list[Arrow]
 
@@ -238,7 +230,6 @@ class Chunk:
 
     def set(self, x: int, y: int, arrow: Arrow):
         self.arrows[y*16+x] = arrow
-
 
 class Map:
     version: int
@@ -312,15 +303,15 @@ class Map:
                     y = (position & 0xF0) >> 4
                     dnf = pop8()
                     has_data = False
+                    is_string = dnf & 0x10 != 0
                     if self.version == 4:
                         has_data = dnf & 1 != 0
                         dnf >>= 1
                     elif self.version == 5:
                         has_data = dnf & 0b1000
-                        dnf &= 0b0111
                     if has_data:
                         val = pop16()
-                        if dnf & 0x10 != 0:
+                        if is_string:
                             strbuf = bytearray()
                             for _ in range(val):
                                 strbuf.append(pop8())
@@ -383,8 +374,9 @@ class Map:
                         if arrow.string:
                             has_data = True
                             raw_data[-1] |= 0x10
-                            push16(len(arrow.string))
-                            for c in arrow.string.encode('utf-8'):
+                            string_data = arrow.string.encode('utf-8')
+                            push16(len(string_data))
+                            for c in string_data:
                                 push8(c)
                         else:
                             val = 0

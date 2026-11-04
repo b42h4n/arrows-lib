@@ -19,7 +19,7 @@ for num in data:
         m.get(x, y+1).type = arrows.ArrowType.BlueArrow
         m.get(x, y+1).direction = arrows.Direction.South
         x += 1
-    m.get(-1, y).type = arrows.ArrowType.DirectoinalButton
+    m.get(-1, y).type = arrows.ArrowType.DirectionalButton
     m.get(-1, y).direction = arrows.Direction.East
     y += 2
 
